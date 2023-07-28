@@ -37,7 +37,7 @@ static struct fen_cstrok_result cstrtok(const char* str, char delim) {
   }
   struct fen_cstrok_result result = {
       .offset = offset, .size = last_occ - offset, .is_last = is_last};
-  if(is_last) {
+  if (is_last) {
     last_occ = 0;
   }
   return result;
@@ -83,7 +83,7 @@ static struct fen fen_validate_piece_position(const char* token,
       case '/':
         --col_idx;
         row_idx = 0;
-                break;
+        break;
       case '0' ... '9': {
         unsigned row_idx_e = row_idx + (curr - '0') - 1;
         assert(row_idx_e <= ROWS);
@@ -101,7 +101,7 @@ static struct fen fen_validate_piece_position(const char* token,
         }
         break;
     }
-  } 
+  }
   assert(col_idx == 0 && row_idx == ROWS);
   return fen_pieces;
 }
@@ -161,24 +161,26 @@ static int fen_parse_number(const char* str, size_t size) {
 
 #define WHITESPACE ' '
 
-static size_t fen_append_castling_info(char* notation, const struct fen_castling_status* cstatus, size_t npos) {
+static size_t fen_append_castling_info(
+    char* notation, const struct fen_castling_status* cstatus, size_t npos) {
   size_t pos = npos;
-  if(cstatus->white.king) {
+  if (cstatus->white.king) {
     notation[pos++] = 'K';
   }
-  if(cstatus->white.queen) {
+  if (cstatus->white.queen) {
     notation[pos++] = 'Q';
   }
-  if(cstatus->black.king) notation[pos++] = 'k';
-  if(cstatus->black.queen) notation[pos++] = 'q';
+  if (cstatus->black.king) notation[pos++] = 'k';
+  if (cstatus->black.queen) notation[pos++] = 'q';
 
-  if(npos - pos == 0) {
+  if (npos - pos == 0) {
     notation[pos++] = '-';
   }
   return pos;
 }
 
-static size_t fen_append_board_info(char* notation, const char board[COLS][ROWS]) {
+static size_t fen_append_board_info(char* notation,
+                                    const char board[COLS][ROWS]) {
   size_t npos = 0;
   for (int i = COLS - 1; i >= 0; i--) {
     size_t space_count = 0;
@@ -211,7 +213,7 @@ static size_t fen_append_board_info(char* notation, const char board[COLS][ROWS]
 
 static size_t fen_append_number(char* notation, size_t pos, size_t number) {
   assert(number < 100);
-  int diff = (int) number - 10;
+  int diff = (int)number - 10;
   size_t size = (diff >= 0) ? 3 : 2;
 
   char str[size];
@@ -224,17 +226,17 @@ static size_t fen_append_number(char* notation, size_t pos, size_t number) {
 // documentation
 // memory error (valgrind)
 char* fen_notation_from_fen(const struct fen* fobj) {
-  if(fobj == NULL) return NULL;
+  if (fobj == NULL) return NULL;
   size_t size_est = (COLS * ROWS) + (COLS - 1) + 20;
-  char* notation = (char*) malloc(size_est);
-  if(notation == NULL) return NULL;
+  char* notation = (char*)malloc(size_est);
+  if (notation == NULL) return NULL;
   size_t npos = fen_append_board_info(notation, fobj->board);
 
   notation[npos++] = fobj->player == FEN_PLAYER_BLACK ? 'b' : 'w';
   APPEND_WHITESPACE(notation, npos);
   npos = fen_append_castling_info(notation, &(fobj->castling), npos);
   APPEND_WHITESPACE(notation, npos);
-  if(fobj->is_enpassent_target_none) {
+  if (fobj->is_enpassent_target_none) {
     notation[npos++] = '-';
   } else {
     notation[npos++] = fobj->enpassent.file;
@@ -251,16 +253,18 @@ char* fen_notation_from_fen(const struct fen* fobj) {
 #undef APPEND_WHITESPACE
 
 struct fen fen_new() {
-  struct fen fobj = (struct fen) { 
-    .player = FEN_PLAYER_WHITE,
-    .is_enpassent_target_none = 1,
-    .halfmove_clock = 0,
-    .fullmove_counter = 0,  };
- for(size_t i=0; i<COLS;++i) {
-    for(size_t j=0; j<ROWS; ++j) {
+  struct fen fobj = (struct fen){
+      .player = FEN_PLAYER_WHITE,
+      .is_enpassent_target_none = 1,
+      .halfmove_clock = 0,
+      .fullmove_counter = 0,
+  };
+  for (size_t i = 0; i < COLS; ++i) {
+    for (size_t j = 0; j < ROWS; ++j) {
       fobj.board[i][j] = WHITESPACE;
     }
-  }  return fobj;
+  }
+  return fobj;
 }
 
 struct fen fen_parse_notation(const char* notation) {
@@ -274,7 +278,7 @@ struct fen fen_parse_notation(const char* notation) {
       char token[tok_res.size + 1];
       token[tok_res.size] = '\0';
       memcpy(token, notation + tok_res.offset, tok_res.size);
-  switch (curr_wi) {
+      switch (curr_wi) {
         case 1:
           fen_obj = fen_validate_piece_position(token, tok_res.size);
           break;
@@ -293,6 +297,7 @@ struct fen fen_parse_notation(const char* notation) {
             assert(tok_res.size == 2 && fen_validate_enpassent_target(token));
             fen_obj.enpassent.file = token[0];
             fen_obj.enpassent.rank = token[1] - '0';
+            fen_obj.is_enpassent_target_none = 0;
           }
           break;
         case 5:
@@ -311,8 +316,8 @@ struct fen fen_parse_notation(const char* notation) {
     if (tok_res.is_last) break;
     tok_res = cstrtok(notation, WHITESPACE);
   }
-  
-    assert(curr_wi == 6);
+
+  assert(curr_wi == 6);
   return fen_obj;
 }
 
