@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "../include/fenc.h"
 
@@ -90,12 +91,13 @@ int main() {
                          0, 1, 1, 0)};
   struct fen fobj;
   size_t success = 0;
+  char* cback = NULL;
   for (size_t i = 0; i < test_cases_c; ++i) {
     struct test_case curr = test_cases[i];
     fobj = fen_parse_notation(curr.notation);
     printf("[%zu:%zu] ", i + 1, test_cases_c);
 
-    char* cback = fen_notation_from_fen(&fobj);
+    cback = fen_notation_from_fen(&fobj);
 
     int cmp_properties = compare_fen_properties(&fobj, &(curr.data));
     if (cmp_properties && (strcmp(cback, curr.notation) == 0)) {
@@ -110,6 +112,7 @@ int main() {
         printf("Expected %s, got %s\n", curr.notation, cback);
       }
     }
+    free(cback);
   }
   printf("Passed %zu out of %zu. Failed %zu\n", success, test_cases_c,
          test_cases_c - success);

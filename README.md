@@ -14,7 +14,7 @@ int main() {
   printf("Can enpassent?: %s", fen_obj.is_enpassent_target_none ? "no": "yes"); 
   // yes
   
-  char* new_notation = fen_from_board(&fen_obj);
+  char* new_notation = fen_notation_from_fen(&fen_obj); // returns a heap allocated string
   // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
   assert(strcmp(new_notation, NOTATION) == 0);
   return 0;
