@@ -3,12 +3,20 @@
 A simple library used to parse Forsyth-Edwards Notation in chess.
 
 ```c
+#include <string.h>
+#include <assert.h>
 #include "fenc.h"
 
+#define NOTATION "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
+
 int main() {  
-  const char* notation =  '...';
-  struct fen fen_obj = fen_parse_notation(notation);
+  struct fen fen_obj = fen_parse_notation(NOTATION);
   printf("Can enpassent?: %s", fen_obj.is_enpassent_target_none ? "no": "yes"); 
+  // yes
+  
+  char* new_notation = fen_from_board(&fen_obj);
+  // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+  assert(strcmp(new_notation, NOTATION) == 0);
   return 0;
 }
 ```
