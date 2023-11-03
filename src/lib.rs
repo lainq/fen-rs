@@ -223,6 +223,9 @@ impl Fen {
         _ => return Err(FenParsingError::InvalidToken),
       }
     }
+    if curr_row != 8 || curr_col > 0 {
+      return Err(FenParsingError::InvalidPosition);
+    }
     Ok(board)
   }
 
@@ -445,5 +448,12 @@ mod tests {
     let notation = "rnbqkbnr/pppppppp/8/8/8/PPPP/QKBNR/PPPPPPPP w KQkq - 0 1";
     let board = Fen::parse(&notation);
     assert_eq!(board, Err(crate::FenParsingError::InvalidPosition));
+  }
+
+  #[test]
+  fn check_less_fields() {
+    let notation = "8/8/8/8 w K - 0 1";
+    let board = Fen::parse(&notation);
+    assert!(board.is_err());
   }
 }
